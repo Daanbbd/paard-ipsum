@@ -72,6 +72,34 @@ select {
   padding: 1.5rem 0 2.5rem;
 }
 
+.taal-toggle {
+  display: inline-flex;
+  gap: 0.3rem;
+  background: rgba(239, 225, 199, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 0.3rem;
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+}
+
+.taal-optie {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--brown-700);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.taal-optie.is-active {
+  background: var(--green-800);
+  color: var(--white);
+  box-shadow: 0 4px 10px rgba(47, 74, 53, 0.3);
+}
+
 .hero-title {
   margin: 0;
   font-size: clamp(2.6rem, 9vw, 4.6rem);

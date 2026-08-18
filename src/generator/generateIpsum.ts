@@ -1,5 +1,10 @@
-import { flourishesVoorNiveau, fragmentenVoorNiveau, willekeurigeConnector } from '../data/paardemeisje';
-import type { GenerateOptions, GenerateResult, Niveau } from './types';
+import * as en from '../data/horsGirlEnglish';
+import * as nl from '../data/paardemeisje';
+import type { GenerateOptions, GenerateResult, Niveau, Taal } from './types';
+
+function inhoud(taal: Taal) {
+  return taal === 'en' ? en : nl;
+}
 
 function kies<T>(lijst: T[]): T {
   return lijst[Math.floor(Math.random() * lijst.length)];
@@ -33,7 +38,7 @@ const FLOURISH_KANS: Record<Niveau, number> = { normaal: 0.35, gevorderd: 0.55, 
 const PLAK_KANS: Record<Niveau, number> = { normaal: 0.15, gevorderd: 0.28, 'volledig-paard': 0.4 };
 
 // Voegt willekeurige chaos toe: CAPS LOCK-woord, opgerekte laatste letter, en/of een flourish.
-function verbasterZin(zin: string, niveau: Niveau): string {
+function verbasterZin(zin: string, niveau: Niveau, taal: Taal): string {
   const woorden = zin.split(' ');
 
   if (woorden.length > 1 && Math.random() < CAPS_KANS[niveau]) {
@@ -49,21 +54,21 @@ function verbasterZin(zin: string, niveau: Niveau): string {
   let resultaat = woorden.join(' ');
 
   if (Math.random() < FLOURISH_KANS[niveau]) {
-    resultaat += ` ${kies(flourishesVoorNiveau(niveau))}`;
+    resultaat += ` ${kies(inhoud(taal).flourishesVoorNiveau(niveau))}`;
   }
 
   return resultaat;
 }
 
-function maakZin(niveau: Niveau, kiesFragment: (pool: string[]) => string): string {
-  const pool = fragmentenVoorNiveau(niveau);
+function maakZin(niveau: Niveau, taal: Taal, kiesFragment: (pool: string[]) => string): string {
+  const pool = inhoud(taal).fragmentenVoorNiveau(niveau);
   let basis = kiesFragment(pool);
 
   if (Math.random() < PLAK_KANS[niveau]) {
-    basis = `${basis}${willekeurigeConnector()}${kiesFragment(pool)}`;
+    basis = `${basis}${inhoud(taal).willekeurigeConnector()}${kiesFragment(pool)}`;
   }
 
-  return verbasterZin(basis, niveau);
+  return verbasterZin(basis, niveau, taal);
 }
 
 function telWoorden(tekst: string): number {
@@ -71,12 +76,12 @@ function telWoorden(tekst: string): number {
 }
 
 export function genereer(options: GenerateOptions): GenerateResult {
-  const { eenheid, aantal, niveau } = options;
+  const { eenheid, aantal, niveau, taal } = options;
   const n = Math.max(1, Math.floor(aantal) || 1);
   const kiesFragment = maakFragmentKiezer();
 
   if (eenheid === 'zinnen') {
-    const zinnen = Array.from({ length: n }, () => maakZin(niveau, kiesFragment));
+    const zinnen = Array.from({ length: n }, () => maakZin(niveau, taal, kiesFragment));
     const tekst = zinnen.join(' ');
     return { tekst, woordenAantal: telWoorden(tekst), zinnenAantal: zinnen.length, paragrafenAantal: 1 };
   }
@@ -86,7 +91,7 @@ export function genereer(options: GenerateOptions): GenerateResult {
     let zinnenTotaal = 0;
     for (let p = 0; p < n; p++) {
       const aantalZinnen = 3 + Math.floor(Math.random() * 4); // 3 t/m 6
-      const zinnen = Array.from({ length: aantalZinnen }, () => maakZin(niveau, kiesFragment));
+      const zinnen = Array.from({ length: aantalZinnen }, () => maakZin(niveau, taal, kiesFragment));
       zinnenTotaal += zinnen.length;
       paragrafen.push(zinnen.join(' '));
     }
@@ -98,7 +103,7 @@ export function genereer(options: GenerateOptions): GenerateResult {
   const zinnen: string[] = [];
   let woordenTotaal = 0;
   while (woordenTotaal < n) {
-    const zin = maakZin(niveau, kiesFragment);
+    const zin = maakZin(niveau, taal, kiesFragment);
     zinnen.push(zin);
     woordenTotaal += telWoorden(zin);
   }
