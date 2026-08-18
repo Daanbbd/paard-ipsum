@@ -7,6 +7,7 @@ import { OutputPanel } from './components/OutputPanel';
 import { genereer } from './generator/generateIpsum';
 import type { Eenheid, GenerateResult, Niveau, Taal } from './generator/types';
 import { useClipboard } from './hooks/useClipboard';
+import { track } from './lib/track';
 
 const STANDAARD_AANTAL: Record<Eenheid, number> = {
   woorden: 50,
@@ -33,6 +34,7 @@ function App() {
   function handleGenereer() {
     setResultaat(genereer({ eenheid, aantal, niveau, taal }));
     schiet();
+    track(`generate/${taal}/${niveau}/${eenheid}`);
   }
 
   function handleEenheidChange(nieuweEenheid: Eenheid) {
@@ -40,11 +42,22 @@ function App() {
     setAantal(STANDAARD_AANTAL[nieuweEenheid]);
   }
 
+  function handleTaalChange(nieuweTaal: Taal) {
+    setTaal(nieuweTaal);
+    track(`taal/${nieuweTaal}`);
+  }
+
+  function handleKopieer() {
+    if (!resultaat) return;
+    kopieer(resultaat.tekst);
+    track('copy');
+  }
+
   return (
     <div className="app-shell">
       <div className="bg-hors" style={{ backgroundImage: `url(${horsAchtergrond})` }} />
       <ConfettiLaag stukjes={stukjes} />
-      <Hero taal={taal} onTaalChange={setTaal} />
+      <Hero taal={taal} onTaalChange={handleTaalChange} />
       <main className="generator">
         <GeneratorControls
           eenheid={eenheid}
@@ -56,12 +69,7 @@ function App() {
           onNiveauChange={setNiveau}
           onGenereer={handleGenereer}
         />
-        <OutputPanel
-          resultaat={resultaat}
-          gekopieerd={gekopieerd}
-          taal={taal}
-          onKopieer={() => resultaat && kopieer(resultaat.tekst)}
-        />
+        <OutputPanel resultaat={resultaat} gekopieerd={gekopieerd} taal={taal} onKopieer={handleKopieer} />
       </main>
       <footer className="footer">
         <p>{FOOTER[taal]}</p>

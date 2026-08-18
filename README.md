@@ -12,6 +12,7 @@ Een Lorem Ipsum-generator, maar dan volledig in de stem van een overenthousiast 
 - Woorden/zinnen/paardagrafen-teller bij elke generatie.
 - Output verschijnt in een scrollbaar venster, zodat lange teksten de pagina niet uitrekken.
 - Rainbow-gradient titel, animeerde rainbow-rand op de generate-knop, en een confetti-burst bij elke generatie.
+- Taal-toggle: **Paard Ipsum** (NL) of **Hors Ipsum** (EN horse-girl slang), inclusief vertaalde UI-labels.
 
 ## Techniek
 
@@ -23,11 +24,17 @@ Een Lorem Ipsum-generator, maar dan volledig in de stem van een overenthousiast 
 
 ```
 src/
-  data/paardemeisje.ts       woordenbank, fragmenten, connectors, flourishes
+  data/paardemeisje.ts       NL woordenbank, fragmenten, connectors, flourishes
+  data/horsGirlEnglish.ts    EN woordenbank, zelfde structuur
   generator/                 generatielogica en types
   components/                Hero, GeneratorControls, OutputPanel, Confetti
   hooks/useClipboard.ts       clipboard-logica
+  lib/track.ts                minimale GoatCounter-wrapper voor interactie-tracking
 ```
+
+## Tracking
+
+Interactie-tracking loopt via [GoatCounter](https://www.goatcounter.com/) (gratis, cookieless, geen consent-banner nodig). Het script staat in `index.html` (`data-goatcounter`), en `src/lib/track.ts` is een dun wrapper-functie die nooit de app breekt als het script niet laadt. Getrackte events: `generate` (met taal/nivo/type), `copy`, en `taal`-wissel — te vinden onder "Pages" in het GoatCounter-dashboard als paden beginnend met `event/`.
 
 ## Lokaal draaien
 
